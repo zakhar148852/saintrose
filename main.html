@@ -1,0 +1,1757 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saint Rose RP — Официальный сайт сообщества</title>
+    <meta name="description" content="Официальный портал игрового сервера Saint Rose RP. Присоединяйтесь к нашему комьюнити!">
+    <meta name="keywords" content="saint rose, rp, gmod, garrys mod, сервер, роль плей, форум">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    
+    <!-- подкл библиотек бд -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
+    <style>
+        :root {
+            --primary-bg: #070506;
+            --secondary-bg: #0f0b0d;
+            --tertiary-bg: #181115;
+            --card-bg: #20161c;
+            --card-bg-hover: #2d1e27;
+            --accent-bg: #ff3366;
+            --accent-bg-light: #ff6699;
+            --text-primary: #ffffff;
+            --text-secondary: #e6d5de;
+            --text-muted: #99838f;
+            --accent-blue: #ff3366;
+            --accent-blue-light: #ff6699;
+            --accent-glow: rgba(255, 51, 102, 0.25);
+            --accent-glow-strong: rgba(255, 51, 102, 0.45);
+            --success: #00e676;
+            --success-glow: rgba(0, 230, 118, 0.4);
+            --warning: #ffb300;
+            --warning-glow: rgba(255, 179, 0, 0.4);
+            --danger: #ff1744;
+            --danger-glow: rgba(255, 23, 68, 0.4);
+            --info: #00b0ff;
+            --info-glow: rgba(0, 176, 255, 0.4);
+            --border-color: rgba(255, 51, 102, 0.08);
+            --border-color-light: rgba(255, 51, 102, 0.18);
+            --border-radius: 12px;
+            --border-radius-sm: 6px;
+            --border-radius-lg: 20px;
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.6);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.7);
+            --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.9);
+            --shadow-glow: 0 0 25px var(--accent-glow);
+            --shadow-glow-strong: 0 0 45px var(--accent-glow-strong);
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+        body {
+            background-color: var(--primary-bg);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--primary-bg);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--tertiary-bg);
+            border-radius: var(--border-radius-sm);
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-bg);
+        }
+        .container {
+            width: 100%;
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 12px 24px;
+            border-radius: var(--border-radius);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            text-decoration: none;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-bg), var(--accent-bg-light));
+            color: white;
+            box-shadow: var(--shadow-sm);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glow);
+            filter: brightness(1.1);
+        }
+        .btn-secondary {
+            background-color: var(--tertiary-bg);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color-light);
+        }
+        .btn-secondary:hover {
+            background-color: var(--card-bg-hover);
+            color: var(--text-primary);
+            border-color: var(--accent-bg);
+        }
+        .btn-icon {
+            padding: 12px;
+            background-color: var(--tertiary-bg);
+            color: var(--text-primary);
+            border-radius: var(--border-radius);
+        }
+        .btn-icon:hover {
+            background-color: var(--accent-bg);
+        }
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            background-color: rgba(7, 5, 6, 0.75);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+        .navbar.scrolled {
+            padding: 10px 0;
+            background-color: rgba(7, 5, 6, 0.95);
+            box-shadow: var(--shadow-md);
+        }
+        .nav-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 80px;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            text-decoration: none;
+        }
+        .logo-img {
+            height: 42px;
+            width: auto;
+            object-fit: contain;
+            display: block;
+        }
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+        .logo-main {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent-bg-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.2;
+        }
+        .logo-sub {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            letter-spacing: 3px;
+            line-height: 1.2;
+            margin-top: 2px;
+        }
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            list-style: none;
+        }
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 10px 16px;
+            border-radius: var(--border-radius-sm);
+            transition: var(--transition);
+        }
+        .nav-link:hover, .nav-link.active {
+            color: var(--text-primary);
+            background-color: var(--tertiary-bg);
+        }
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .server-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background-color: var(--secondary-bg);
+            padding: 8px 14px;
+            border-radius: 30px;
+            border: 1px solid var(--border-color);
+        }
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        .status-indicator.online {
+            background-color: var(--success);
+            box-shadow: 0 0 10px var(--success);
+        }
+        .status-text {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+        .player-count {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .mobile-menu-btn {
+            display: none;
+        }
+        .hero {
+            position: relative;
+            padding: 180px 0 100px;
+            background: radial-gradient(circle at 50% -20%, rgba(255, 51, 102, 0.15), transparent 60%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .hero-content {
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background-color: rgba(255, 51, 102, 0.1);
+            border: 1px solid rgba(255, 51, 102, 0.2);
+            padding: 6px 16px;
+            border-radius: 30px;
+            color: var(--accent-bg-light);
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+        .hero-title {
+            font-size: 54px;
+            font-weight: 800;
+            line-height: 1.15;
+            letter-spacing: -1px;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, #ffffff, #ff6699);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero-subtitle {
+            font-size: 18px;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            max-width: 650px;
+        }
+        .hero-buttons {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .main-content {
+            padding: 40px 24px 80px;
+        }
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 28px;
+        }
+        .section-header h2 {
+            font-size: 22px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .section-header h2 i {
+            color: var(--accent-bg);
+        }
+        .view-all-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+        .view-all-link:hover {
+            color: var(--accent-bg-light);
+        }
+        .announcements {
+            margin-bottom: 60px;
+        }
+        .announcements-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+        }
+        .announcement-card {
+            background-color: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition);
+        }
+        .announcement-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--border-color-light);
+            background-color: var(--tertiary-bg);
+            box-shadow: var(--shadow-md);
+        }
+        .announcement-card.featured {
+            grid-column: span 2;
+            background: linear-gradient(135deg, var(--secondary-bg), var(--tertiary-bg));
+            border-left: 4px solid var(--accent-bg);
+        }
+        .announcement-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        .announcement-date {
+            font-size: 12px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .announcement-tag {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            border-radius: 4px;
+            letter-spacing: 0.5px;
+        }
+        .tag-update { background-color: rgba(255, 51, 102, 0.15); color: var(--accent-bg-light); }
+        .tag-news { background-color: rgba(0, 176, 255, 0.15); color: #60a5fa; }
+        .tag-event { background-color: rgba(0, 230, 118, 0.15); color: #34d399; }
+        .announcement-card h3 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+        .announcement-card p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 24px;
+            display: -webkit-box;
+            -webkit-line-clamp: 4;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .announcement-footer {
+            margin-top: auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+        }
+        .read-more {
+            color: var(--accent-bg-light);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: var(--transition);
+        }
+        .read-more:hover {
+            gap: 10px;
+        }
+        .announcement-stats {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+        .announcement-stats span {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 32px;
+        }
+        .forum-categories {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .category-card {
+            background-color: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .category-card:hover {
+            background-color: var(--card-bg-hover);
+            border-color: var(--border-color-light);
+            transform: translateX(4px);
+        }
+        .category-icon {
+            width: 48px;
+            height: 48px;
+            background-color: var(--tertiary-bg);
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: var(--accent-bg);
+            border: 1px solid rgba(255, 51, 102, 0.1);
+            transition: var(--transition);
+        }
+        .category-card:hover .category-icon {
+            background-color: var(--accent-bg);
+            color: white;
+        }
+        .category-info {
+            flex-grow: 1;
+        }
+        .category-info h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .category-info p {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+        .category-stats {
+            display: flex;
+            gap: 16px;
+            margin-top: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--accent-bg-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .category-stats span {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .category-arrow {
+            color: var(--text-muted);
+            font-size: 14px;
+            transition: var(--transition);
+        }
+        .category-card:hover .category-arrow {
+            color: var(--text-primary);
+            transform: translateX(2px);
+        }
+        
+        .forum-board-container {
+            display: none;
+            background-color: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 24px;
+        }
+        .forum-board-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color-light);
+            padding-bottom: 16px;
+            margin-bottom: 20px;
+        }
+        .forum-back-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+        }
+        .forum-back-btn:hover {
+            color: var(--accent-bg-light);
+        }
+        .forum-form-box {
+            display: none;
+            background-color: var(--tertiary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+        .forum-form-box h3 {
+            font-size: 16px;
+            margin-bottom: 16px;
+            color: var(--text-primary);
+        }
+        .form-group {
+            margin-bottom: 14px;
+        }
+        .form-control {
+            width: 100%;
+            background-color: var(--primary-bg);
+            border: 1px solid var(--border-color-light);
+            border-radius: var(--border-radius-sm);
+            padding: 12px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 14px;
+            outline: none;
+            transition: var(--transition);
+        }
+        .form-control:focus {
+            border-color: var(--accent-bg);
+            box-shadow: 0 0 10px rgba(255, 51, 102, 0.1);
+        }
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+            user-select: text;
+        }
+        input.form-control {
+            user-select: text;
+        }
+        .threads-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .thread-item {
+            background-color: var(--tertiary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .thread-item:hover {
+            border-color: var(--accent-bg-light);
+            transform: translateY(-2px);
+            background-color: var(--card-bg-hover);
+        }
+        .thread-main-info h4 {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        .thread-meta-info {
+            font-size: 12px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .thread-meta-info span i {
+            margin-right: 4px;
+        }
+        .thread-reply-badge {
+            background-color: rgba(255, 51, 102, 0.1);
+            border: 1px solid rgba(255, 51, 102, 0.2);
+            color: var(--accent-bg-light);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .no-threads {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 40px;
+            font-size: 14px;
+        }
+        
+        .thread-view-box {
+            display: none;
+        }
+        .thread-view-header {
+            border-bottom: 1px solid var(--border-color-light);
+            padding-bottom: 14px;
+            margin-bottom: 20px;
+        }
+        .thread-view-header h3 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .post-card {
+            background-color: var(--tertiary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 16px;
+            display: flex;
+            gap: 16px;
+        }
+        .post-card.original-post {
+            border-left: 4px solid var(--accent-bg);
+        }
+        .post-author-zone {
+            min-width: 100px;
+            text-align: center;
+        }
+        .post-avatar-mock {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-bg-light);
+            font-size: 16px;
+            margin: 0 auto 8px;
+        }
+        .post-author-name {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-primary);
+            word-break: break-all;
+        }
+        .post-author-role {
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+        .post-body-zone {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .post-text-content {
+            font-size: 14px;
+            color: var(--text-secondary);
+            user-select: text;
+            white-space: pre-wrap;
+            margin-bottom: 12px;
+        }
+        .post-time-stamp {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-align: right;
+        }
+        .replies-section-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin: 24px 0 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        .sidebar-widget {
+            background-color: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 24px;
+        }
+        .sidebar-widget h3 {
+            font-size: 15px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-secondary);
+        }
+        .sidebar-widget h3 i {
+            color: var(--accent-bg);
+        }
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+        .stat-box {
+            background-color: var(--tertiary-bg);
+            border: 1px solid var(--border-color);
+            padding: 16px;
+            border-radius: var(--border-radius);
+            text-align: center;
+        }
+        .stat-box-icon {
+            font-size: 16px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+        .stat-box-value {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+        .stat-box-label {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+        .discord-widget {
+            background: linear-gradient(135deg, var(--secondary-bg), rgba(255, 51, 102, 0.05));
+        }
+        .social-buttons-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 20px;
+            width: 100%;
+        }
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 14px;
+            border-radius: var(--border-radius);
+            font-size: 14px;
+            font-weight: 600;
+            text-decoration: none;
+            color: white;
+            transition: var(--transition);
+        }
+        .btn-tg { background-color: #24A1DE; }
+        .btn-tg:hover { background-color: #31b3f3; box-shadow: 0 4px 14px rgba(36, 161, 222, 0.4); }
+        .btn-steam { background-color: #171a21; border: 1px solid #2a475e; }
+        .btn-steam:hover { background-color: #2a475e; box-shadow: 0 4px 14px rgba(42, 71, 94, 0.4); }
+        .btn-rules { background-color: #4285f4; }
+        .btn-rules:hover { background-color: #5c97f5; box-shadow: 0 4px 14px rgba(66, 133, 244, 0.4); }
+        .servers-section {
+            background-color: var(--secondary-bg);
+            padding: 60px 0;
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 60px;
+        }
+        .servers-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        .server-card {
+            background-color: var(--tertiary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 32px;
+        }
+        .server-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            user-select: none;
+        }
+        .server-icon {
+            width: 48px;
+            height: 48px;
+            background-color: rgba(255, 51, 102, 0.1);
+            color: var(--accent-bg);
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        .server-name {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .server-status-badge {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+        .server-status-badge.online { background-color: rgba(0, 230, 118, 0.15); color: #34d399; }
+        .server-info {
+            flex-grow: 1;
+            max-width: 400px;
+        }
+        .server-map {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .server-players {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .player-bar {
+            flex-grow: 1;
+            height: 6px;
+            background-color: var(--card-bg);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .player-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+        }
+        .player-bar-fill.high { background: linear-gradient(to right, var(--accent-bg), var(--accent-bg-light)); }
+        .player-count-text {
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+        .server-connect {
+            display: flex;
+            gap: 12px;
+        }
+        .team-section {
+            margin-bottom: 60px;
+        }
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .team-card {
+            background-color: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 32px 24px;
+            text-align: center;
+            transition: var(--transition);
+        }
+        .team-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--border-color-light);
+            box-shadow: var(--shadow-md);
+        }
+        .team-avatar {
+            width: 80px;
+            height: 80px;
+            background-color: var(--tertiary-bg);
+            border-radius: 50%;
+            margin: 0 auto 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: var(--accent-bg);
+            border: 2px solid var(--border-color);
+        }
+        .team-name {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .team-role {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .faq-section {
+            margin-bottom: 80px;
+        }
+        .faq-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .faq-item {
+            background-color: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+        .faq-question {
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .faq-question:hover {
+            background-color: var(--tertiary-bg);
+        }
+        .faq-question h4 {
+            font-size: 15px;
+            font-weight: 600;
+        }
+        .faq-icon {
+            font-size: 12px;
+            color: var(--text-muted);
+            transition: var(--transition);
+        }
+        .faq-item.active .faq-icon {
+            transform: rotate(45deg);
+            color: var(--text-primary);
+        }
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s cubic-bezier(0, 1, 0, 1);
+        }
+        .faq-item.active .faq-answer {
+            max-height: 1000px;
+            transition: max-height 0.3s cubic-bezier(1, 0, 1, 0);
+        }
+        .faq-answer-content {
+            padding: 4px 24px 24px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            border-top: 1px solid rgba(255, 255, 255, 0.02);
+        }
+        .footer {
+            background-color: #040303;
+            padding: 30px 0;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+        }
+        .footer-bottom p {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .toast {
+            background-color: var(--tertiary-bg);
+            border: 1px solid var(--border-color-light);
+            border-left: 4px solid var(--accent-bg);
+            padding: 14px 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transform: translateX(120%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            max-width: 320px;
+        }
+        .toast.show {
+            transform: translateX(0);
+        }
+        .toast i {
+            color: var(--accent-bg-light);
+            font-size: 16px;
+        }
+        .toast-text {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        .animate-in {
+            opacity: 0;
+            transform: translateY(15px);
+            animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+        .animate-delay-1 { animation-delay: 0.05s; }
+        .animate-delay-2 { animation-delay: 0.1s; }
+        .animate-delay-3 { animation-delay: 0.15s; }
+        .animate-delay-4 { animation-delay: 0.2s; }
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        @media (max-width: 1024px) {
+            .content-grid { grid-template-columns: 1fr; }
+            .announcements-grid { grid-template-columns: repeat(2, 1fr); }
+            .announcement-card.featured { grid-column: span 2; }
+        }
+        @media (max-width: 768px) {
+            .nav-menu { display: none; }
+            .mobile-menu-btn { display: block; }
+            .hero-title { font-size: 38px; }
+            .announcements-grid { grid-template-columns: 1fr; }
+            .announcement-card.featured { grid-column: span 1; }
+            .server-card { flex-direction: column; align-items: stretch; gap: 20px; text-align: center; }
+            .server-header { flex-direction: column; }
+            .server-info { max-width: 100%; }
+            .server-connect { flex-direction: column; }
+            .team-grid { grid-template-columns: 1fr; }
+            .social-buttons-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar" id="navbar">
+        <div class="container nav-container">
+            <a href="#" class="logo">
+                <img src="path/to/logo.png" alt="Logo" class="logo-img" onerror="this.style.display='none'">
+                <div class="logo-text">
+                    <span class="logo-main">SAINT ROSE</span>
+                    <span class="logo-sub">PROJECT</span>
+                </div>
+            </a>
+            
+            <ul class="nav-menu" id="nav-menu">
+                <li><a href="#" class="nav-link active">Главная</a></li>
+                <li><a href="#forums" class="nav-link">Форумы</a></li>
+                <li><a href="#servers" class="nav-link">Серверы</a></li>
+                <li><a href="#team" class="nav-link">Команда</a></li>
+                <li><a href="#faq" class="nav-link">FAQ</a></li>
+            </ul>
+            
+            <div class="nav-actions">
+                <div class="server-status" id="server-status">
+                    <span class="status-indicator online"></span>
+                    <span class="status-text">Онлайн</span>
+                    <span class="player-count">42/64</span>
+                </div>
+                <button class="btn btn-primary" id="login-btn">
+                    <i class="fas fa-sign-in-alt"></i>
+                    <span>Войти</span>
+                </button>
+                <button class="btn btn-icon mobile-menu-btn" id="mobile-menu-btn">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="container hero-content">
+            <div class="hero-badge">
+                <i class="fas fa-check-circle"></i>
+                <span>Официальный портал игрового сервера</span>
+            </div>
+            <h1 class="hero-title">Добро пожаловать на Saint Rose RP</h1>
+            <p class="hero-subtitle">
+                Погрузитесь в невероятную атмосферу криминального и гражданского мира San Andreas на платформе Garry's Mod. 
+                Постройте свою карьеру, заводите новые знакомства и играйте по правилам честной игры!
+            </p>
+            <div class="hero-buttons">
+                <a href="steam://connect/46.174.49.224:27015" class="btn btn-primary">
+                    <i class="fas fa-play"></i>
+                    Подключиться к серверу
+                </a>
+                <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=3742811263" target="_blank" class="btn btn-secondary">
+                    <i class="fas fa-cubes"></i>
+                    Коллекция модов (Воркшоп)
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <main class="container main-content">
+        <section class="announcements">
+            <div class="section-header">
+                <h2><i class="fas fa-bullhorn"></i> Новости и объявления</h2>
+                <a href="#" class="view-all-link">Все новости <i class="fas fa-arrow-right"></i></a>
+            </div>
+            
+            <div class="announcements-grid">
+                <div class="announcement-card featured animate-in">
+                    <div class="announcement-meta">
+                        <span class="announcement-date"><i class="far fa-calendar"></i> Сегодня</span>
+                        <span class="announcement-tag tag-update">Обновление</span>
+                    </div>
+                    <h3>Глобальное весеннее обновление системы фракций</h3>
+                    <p>
+                        Мы полностью переработали функционал государственных структур и криминальных синдикатов. 
+                        Добавлены новые интерьеры, расширен автопарк, а также внедрена уникальная система кастомизации личного оружия. 
+                        Все моды и превью уже доступны в официальной коллекции в мастерской Steam! По ссылке ниже вы можете изучить полный контент.
+                    </p>
+                    <div class="announcement-footer">
+                        <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=3742811263" target="_blank" class="read-more">Контент сервера <i class="fas fa-arrow-right"></i></a>
+                        <div class="announcement-stats">
+                            <span><i class="far fa-eye"></i> 5,482</span>
+                            <span><i class="far fa-comment"></i> 241</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="announcement-card animate-in animate-delay-1">
+                    <div class="announcement-meta">
+                        <span class="announcement-date"><i class="far fa-calendar"></i> Вчера</span>
+                        <span class="announcement-tag tag-news">Новость</span>
+                    </div>
+                    <h3>Открыты заявки на посты лидеров</h3>
+                    <p>
+                        Требуются амбизиозные игроки на лидерство ключевых игровых фракций. Успей оставить свое резюме в соответствующем разделе. 
+                        Обязательное условие перед подачей — внимательно прочитать правила проекта.
+                    </p>
+                    <div class="announcement-footer">
+                        <a href="https://docs.google.com/document/d/1JIc9nOFAGEs99BRU35NmmP_7o1FICiyjpmQyGmnIBEQ/edit?usp=sharing" target="_blank" class="read-more">Читать правила <i class="fas fa-arrow-right"></i></a>
+                        <div class="announcement-stats">
+                            <span><i class="far fa-eye"></i> 1,102</span>
+                            <span><i class="far fa-comment"></i> 74</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="announcement-card animate-in animate-delay-2">
+                    <div class="announcement-meta">
+                        <span class="announcement-date"><i class="far fa-calendar"></i> 3 дня назад</span>
+                        <span class="announcement-tag tag-event">Событие</span>
+                    </div>
+                    <h3>Амнистия игровых аккаунтов</h3>
+                    <p>
+                        Стартовала масштабная подача заявлений на досрочную амнистию за незначительные нарушения. 
+                        Внимательно ознакомьтесь с критериями перед публикацией. Помните: у нас ведется честная игра без сюрпризов!
+                    </p>
+                    <div class="announcement-footer">
+                        <a href="#" class="read-more">Ознакомиться <i class="fas fa-arrow-right"></i></a>
+                        <div class="announcement-stats">
+                            <span><i class="far fa-eye"></i> 3,845</span>
+                            <span><i class="far fa-comment"></i> 512</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="content-grid" id="forums">
+            <section class="forum-categories" id="categories-view">
+                <div class="section-header">
+                    <h2><i class="fas fa-comments"></i> Разделы форума</h2>
+                </div>
+
+                <div class="category-card animate-in" id="category-complaints">
+                    <div class="category-icon"><i class="fas fa-gavel"></i></div>
+                    <div class="category-info">
+                        <h3>Создать свою тему</h3>
+                        <p>Раздел для подачи всех возможных заявок</p>
+                        <div class="category-stats"><span><i class="fas fa-folder"></i> <span id="complaints-count">0</span> тем</span></div>
+                    </div>
+                    <div class="category-arrow"><i class="fas fa-chevron-right"></i></div>
+                </div>
+
+                <div class="category-card animate-in animate-delay-1" onclick="showToast('Этот раздел находится в разработке кодерами сервера!')">
+                    <div class="category-icon"><i class="fas fa-building"></i></div>
+                    <div class="category-info">
+                        <h3>Государственные организации</h3>
+                        <p>Полиция, МЗ, МОРФ. Отчеты, заявления и внутренние уставы фракций</p>
+                        <div class="category-stats"><span><i class="fas fa-folder"></i> 4,821 тем</span></div>
+                    </div>
+                    <div class="category-arrow"><i class="fas fa-chevron-right"></i></div>
+                </div>
+
+                <div class="category-card animate-in animate-delay-2" onclick="showToast('Этот раздел находится в разработке кодерами сервера!')">
+                    <div class="category-icon"><i class="fas fa-gavel"></i></div>
+                    <div class="category-info">
+                        <h3>Нелегальные структуры</h3>
+                        <p>Уличные группировки (банды) и синдикаты (мафии). Дипломатия и правила криминальных структур</p>
+                        <div class="category-stats"><span><i class="fas fa-folder"></i> 2,931 тем</span></div>
+                    </div>
+                    <div class="category-arrow"><i class="fas fa-chevron-right"></i></div>
+                </div>
+
+                <div class="category-card animate-in animate-delay-3" onclick="showToast('Этот раздел находится в разработке кодерами сервера!')">
+                    <div class="category-icon"><i class="fas fa-user-circle"></i></div>
+                    <div class="category-info">
+                        <h3>Игровые обсуждения</h3>
+                        <p>Биографии персонажей, общение игроков, квесты и создание неофициальных организаций</p>
+                        <div class="category-stats"><span><i class="fas fa-folder"></i> 854 тем</span></div>
+                    </div>
+                    <div class="category-arrow"><i class="fas fa-chevron-right"></i></div>
+                </div>
+            </section>
+
+            <section class="forum-board-container" id="forum-board">
+                <div class="forum-board-header">
+                    <button class="forum-back-btn" id="btn-back-to-cats">
+                        <i class="fas fa-arrow-left"></i> Назад к разделам
+                    </button>
+                    <button class="btn btn-primary" id="btn-toggle-thread-form">
+                        <i class="fas fa-plus"></i> Создать тему
+                    </button>
+                </div>
+
+                <div class="forum-form-box" id="new-thread-form-box">
+                    <h3>Создание новой темы</h3>
+                    <div class="form-group">
+                        <input type="text" id="thread-author-input" class="form-control" placeholder="Ваш никнейм (например, Ivan_Ivanov)">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" id="thread-title-input" class="form-control" placeholder="Заголовок темы / Суть жалобы">
+                    </div>
+                    <div class="form-group">
+                        <textarea id="thread-text-input" class="form-control" placeholder="Опишите ситуацию подробно..."></textarea>
+                    </div>
+                    <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                        <button class="btn btn-secondary" id="btn-cancel-thread">Отмена</button>
+                        <button class="btn btn-primary" id="btn-submit-thread">Опубликовать</button>
+                    </div>
+                </div>
+
+                <div id="threads-list-view">
+                    <div class="threads-list" id="threads-inner-list">
+                    </div>
+                </div>
+
+                <div class="thread-view-box" id="thread-single-view">
+                    <div class="forum-board-header" style="border: none; margin: 0; padding: 0 0 14px;">
+                        <button class="forum-back-btn" id="btn-back-to-threads">
+                            <i class="fas fa-arrow-left"></i> К списку тем
+                        </button>
+                    </div>
+                    
+                    <div class="thread-view-header">
+                        <h3 id="single-thread-title">Заголовок темы</h3>
+                    </div>
+
+                    <div id="thread-posts-container">
+                    </div>
+
+                    <div class="replies-section-title">Оставить ответ в теме</div>
+                    <div class="forum-form-box" style="display: block; background-color: var(--secondary-bg); padding: 0; border: none;">
+                        <div class="form-group">
+                            <input type="text" id="reply-author-input" class="form-control" placeholder="Ваш никнейм">
+                        </div>
+                        <div class="form-group">
+                            <textarea id="reply-text-input" class="form-control" placeholder="Напишите ваш ответ..."></textarea>
+                        </div>
+                        <div style="display: flex; justify-content: flex-end;">
+                            <button class="btn btn-primary" id="btn-submit-reply">Отправить ответ</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <aside class="sidebar">
+                <div class="sidebar-widget animate-in">
+                    <h3><i class="fas fa-chart-bar"></i> Статистика сервера</h3>
+                    <div class="stat-grid">
+                        <div class="stat-box">
+                            <div class="stat-box-icon"><i class="fas fa-users"></i></div>
+                            <div class="stat-box-value">14,251</div>
+                            <div class="stat-box-label">Аккаунтов</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-box-icon"><i class="fas fa-folder"></i></div>
+                            <div class="stat-box-value" id="total-threads-stat">9,834</div>
+                            <div class="stat-box-label">Тем</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sidebar-widget discord-widget animate-in animate-delay-1">
+                    <h3><i class="fas fa-share-nodes"></i> Наши social сети</h3>
+                    <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">Присоединяйтесь к нам на внешних площадках, чтобы следить за новостями проекта:</p>
+                    <div class="social-buttons-grid">
+                        <a href="https://t.me/saintroseproject" target="_blank" class="social-btn btn-tg">
+                            <i class="fab fa-telegram-plane"></i> TG
+                        </a>
+                        <a href="https://steamcommunity.com/groups/saintroseproject" target="_blank" class="social-btn btn-steam">
+                            <i class="fab fa-steam"></i> Группа
+                        </a>
+                        <a href="https://docs.google.com/document/d/1JIc9nOFAGEs99BRU35NmmP_7o1FICiyjpmQyGmnIBEQ/edit?usp=sharing" target="_blank" class="social-btn btn-rules">
+                            <i class="fas fa-scroll"></i> Правила
+                        </a>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <section class="servers-section" id="servers">
+        <div class="container">
+            <div class="section-header">
+                <h2><i class="fas fa-server"></i> Статус подключения</h2>
+            </div>
+            <div class="servers-grid">
+                <div class="server-card online animate-in">
+                    <div class="server-header">
+                        <div class="server-icon"><i class="fas fa-gamepad"></i></div>
+                        <div>
+                            <div class="server-name">Saint Rose RP | Garry's Mod</div>
+                            <span class="server-status-badge online">Работает</span>
+                        </div>
+                    </div>
+                    <div class="server-info">
+                        <div class="server-map"><i class="fas fa-globe"></i> Mode: Serious RolePlay</div>
+                        <div class="server-players">
+                            <div class="player-bar"><div class="player-bar-fill high" style="width: 65%;"></div></div>
+                            <span class="player-count-text" id="serverPlayerCount">42 / 64</span>
+                        </div>
+                    </div>
+                    <div class="server-connect">
+                        <button class="btn btn-secondary" onclick="copyToClipboard('46.174.49.224:27015')">
+                            <i class="fas fa-copy"></i> Скопировать IP
+                        </button>
+                        <a href="steam://connect/46.174.49.224:27015" class="btn btn-primary">
+                            <i class="fas fa-play"></i> Начать игру
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="team-section" id="team">
+        <div class="container">
+            <div class="section-header" style="text-align: center; justify-content: center; margin-bottom: 40px;">
+                <h2><i class="fas fa-crown"></i> Администрация проекта</h2>
+            </div>
+            <div class="team-grid">
+                <div class="team-card animate-in">
+                    <div class="team-avatar"><i class="fas fa-user-shield"></i></div>
+                    <div class="team-name">amr</div>
+                    <div class="team-role">Основатель</div>
+                </div>
+                <div class="team-card animate-in animate-delay-1">
+                    <div class="team-avatar"><i class="fas fa-code"></i></div>
+                    <div class="team-name">Nacho Varga</div>
+                    <div class="team-role">Кодер</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="faq-section" id="faq">
+        <div class="container">
+            <div class="section-header">
+                <h2><i class="fas fa-question-circle"></i> Помощь новичкам (FAQ)</h2>
+            </div>
+            <div class="faq-grid">
+                <div class="faq-item animate-in">
+                    <div class="faq-question">
+                        <h4>Как зайти на ваш server?</h4>
+                        <div class="faq-icon"><i class="fas fa-plus"></i></div>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            Запустите Garry's Mod, откройте консоль разработчика (клавиша ~) и введите команду: 
+                            <code>connect 46.174.49.224:27015</code> или просто нажмите кнопку «Начать игру» или «Подключиться к серверу» на нашем сайте.
+                        </div>
+                    </div>
+                </div>
+                <div class="faq-item animate-in animate-delay-1">
+                    <div class="faq-question">
+                        <h4>Где найти контент сервера, чтобы не было ошибок (ERROR)?</h4>
+                        <div class="faq-icon"><i class="fas fa-plus"></i></div>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            Весь необходимый контент, аддоны, моды и превью находятся в нашей официальной коллекции Steam Workshop. Вы можете перейти по кнопке «Коллекция модов» вверху страницы или воспользоваться ссылкой: <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=3742811263" target="_blank" style="color: var(--accent-bg-light);">наша коллекция</a>. Нажмите кнопку «Подписаться на все».
+                        </div>
+                    </div>
+                </div>
+                <div class="faq-item animate-in animate-delay-2">
+                    <div class="faq-question">
+                        <h4>Каковы правила поведения на сервере?</h4>
+                        <div class="faq-icon"><i class="fas fa-plus"></i></div>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            Наше главное правило — это честная игра без сюрпризов. Ознакомиться с полным сводом правил и законов штата можно в официальном документе проекта по ссылке: <a href="https://docs.google.com/document/d/1JIc9nOFAGEs99BRU35NmmP_7o1FICiyjpmQyGmnIBEQ/edit?usp=sharing" target="_blank" style="color: var(--accent-bg-light);">Документ с правилами</a>.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2021-2026 Saint Rose RP. Все права защищены. Разработано на базе Garry's Mod.</p>
+            </div>
+        </div>
+    </footer>
+
+    <div class="toast-container" id="toast-container"></div>
+
+    <script>
+        const adminHash = "ba797c231016839fae6bf26a798548a3bf6ee2c85e33d06191f630ff04bc99cb";
+
+        // настройка файр басе
+         const firebaseConfig = {
+             apiKey: "AIzaSyBfkdAjIGP-81xlMYs8UL6G4-WWLHO9tSM",
+             authDomain: "saintrose-fcb5b.firebaseapp.com",
+             databaseURL: "https://saintrose-fcb5b-default-rtdb.europe-west1.firebasedatabase.app",
+             projectId: "saintrose-fcb5b",
+             storageBucket: "saintrose-fcb5b.firebasestorage.app",
+             messagingSenderId: "935444066735",
+             appId: "1:935444066735:web:d104497e3af5c872d83f5a",
+             measurementId: "G-FQTETMP5M4"
+};
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        let threads = [];
+        let currentThreadId = null;
+
+        const categoriesView = document.getElementById('categories-view');
+        const forumBoard = document.getElementById('forum-board');
+        const threadsInnerList = document.getElementById('threads-inner-list');
+        const newThreadFormBox = document.getElementById('new-thread-form-box');
+        const threadsListView = document.getElementById('threads-list-view');
+        const threadSingleView = document.getElementById('thread-single-view');
+        const threadPostsContainer = document.getElementById('thread-posts-container');
+        const complaintsCount = document.getElementById('complaints-count');
+        const totalThreadsStat = document.getElementById('total-threads-stat');
+
+        function updateForumStats() {
+            complaintsCount.textContent = threads.length;
+            totalThreadsStat.textContent = 9834 + threads.length;
+        }
+
+        function formatDate() {
+            const d = new Date();
+            return `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()} в ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+        }
+
+        // подкл к бд
+        database.ref('forum_threads').on('value', (snapshot) => {
+            const data = snapshot.val();
+            threads = [];
+            if (data) {
+                // Превращаем полученный объект Firebase в массив
+                threads = Object.keys(data).map(key => {
+                    const thread = data[key];
+                    thread.id = key; // Используем строковый ключ Firebase в качестве id
+                    if (!thread.replies) thread.replies = [];
+                    return thread;
+                });
+                threads.sort((a, b) => b.timestamp - a.timestamp);
+            }
+            updateForumStats();
+            renderThreadsList();
+
+            if (currentThreadId) {
+                const updatedThread = threads.find(t => t.id === currentThreadId);
+                if (updatedThread) {
+                    renderThreadPosts(updatedThread);
+                }
+            }
+        });
+
+        function renderThreadsList() {
+            threadsInnerList.innerHTML = '';
+            if (threads.length === 0) {
+                threadsInnerList.innerHTML = '<div class="no-threads">В данном разделе еще нет тем. Будьте первым, кто создаст тему!</div>';
+                return;
+            }
+
+            threads.forEach(thread => {
+                const item = document.createElement('div');
+                item.className = 'thread-item animate-in';
+                item.innerHTML = `
+                    <div class="thread-main-info">
+                        <h4>${escapeHTML(thread.title)}</h4>
+                        <div class="thread-meta-info">
+                            <span><i class="far fa-user"></i> ${escapeHTML(thread.author)}</span>
+                            <span><i class="far fa-calendar"></i> ${thread.date}</span>
+                        </div>
+                    </div>
+                    <div class="thread-reply-badge">
+                        <i class="far fa-comment"></i> ${thread.replies.length}
+                    </div>
+                `;
+                item.addEventListener('click', () => openThread(thread.id));
+                threadsInnerList.appendChild(item);
+            });
+        }
+
+        function openThread(id) {
+            currentThreadId = id;
+            const thread = threads.find(t => t.id === id);
+            if (!thread) return;
+
+            threadsListView.style.display = 'none';
+            newThreadFormBox.style.display = 'none';
+            document.getElementById('btn-toggle-thread-form').style.display = 'none';
+            threadSingleView.style.display = 'block';
+
+            document.getElementById('single-thread-title').textContent = thread.title;
+            renderThreadPosts(thread);
+        }
+
+        function renderThreadPosts(thread) {
+            threadPostsContainer.innerHTML = '';
+
+            const mainPost = document.createElement('div');
+            mainPost.className = 'post-card original-post';
+            mainPost.innerHTML = `
+                <div class="post-author-zone">
+                    <div class="post-avatar-mock"><i class="fas fa-user"></i></div>
+                    <div class="post-author-name">${escapeHTML(thread.author)}</div>
+                    <div class="post-author-role">Пользователь</div>
+                </div>
+                <div class="post-body-zone">
+                    <div class="post-text-content">${escapeHTML(thread.text)}</div>
+                    <div class="post-time-stamp">${thread.date}</div>
+                </div>
+            `;
+            threadPostsContainer.appendChild(mainPost);
+
+            thread.replies.forEach(reply => {
+                const replyCard = document.createElement('div');
+                replyCard.className = 'post-card';
+                replyCard.innerHTML = `
+                    <div class="post-author-zone">
+                        <div class="post-avatar-mock"><i class="fas fa-comment-dots"></i></div>
+                        <div class="post-author-name">${escapeHTML(reply.author)}</div>
+                        <div class="post-author-role">Игрок</div>
+                    </div>
+                    <div class="post-body-zone">
+                        <div class="post-text-content">${escapeHTML(reply.text)}</div>
+                        <div class="post-time-stamp">${reply.date}</div>
+                    </div>
+                `;
+                threadPostsContainer.appendChild(replyCard);
+            });
+        }
+
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            );
+        }
+
+        document.getElementById('category-complaints').addEventListener('click', () => {
+            categoriesView.style.display = 'none';
+            forumBoard.style.display = 'block';
+            threadsListView.style.display = 'block';
+            threadSingleView.style.display = 'none';
+            document.getElementById('btn-toggle-thread-form').style.display = 'inline-flex';
+            renderThreadsList();
+        });
+
+        document.getElementById('btn-back-to-cats').addEventListener('click', () => {
+            forumBoard.style.display = 'none';
+            categoriesView.style.display = 'flex';
+            newThreadFormBox.style.display = 'none';
+        });
+
+        document.getElementById('btn-back-to-threads').addEventListener('click', () => {
+            threadSingleView.style.display = 'none';
+            threadsListView.style.display = 'block';
+            document.getElementById('btn-toggle-thread-form').style.display = 'inline-flex';
+            currentThreadId = null;
+            renderThreadsList();
+        });
+
+        document.getElementById('btn-toggle-thread-form').addEventListener('click', () => {
+            newThreadFormBox.style.display = newThreadFormBox.style.display === 'block' ? 'none' : 'block';
+        });
+
+        document.getElementById('btn-cancel-thread').addEventListener('click', () => {
+            newThreadFormBox.style.display = 'none';
+        });
+
+        // темы в файр басе
+        document.getElementById('btn-submit-thread').addEventListener('click', () => {
+            const author = document.getElementById('thread-author-input').value.trim();
+            const title = document.getElementById('thread-title-input').value.trim();
+            const text = document.getElementById('thread-text-input').value.trim();
+
+            if (!author || !title || !text) {
+                showToast('Заполните все поля создания темы!');
+                return;
+            }
+
+            const newThread = {
+                author: author,
+                title: title,
+                text: text,
+                date: formatDate(),
+                timestamp: Date.now(),
+                replies: []
+            };
+
+            // запрос к бд
+            database.ref('forum_threads').push(newThread);
+
+            document.getElementById('thread-author-input').value = '';
+            document.getElementById('thread-title-input').value = '';
+            document.getElementById('thread-text-input').value = '';
+            newThreadFormBox.style.display = 'none';
+
+            showToast('Тема успешно опубликована!');
+        });
+
+        // файр басе
+        document.getElementById('btn-submit-reply').addEventListener('click', () => {
+            const author = document.getElementById('reply-author-input').value.trim();
+            const text = document.getElementById('reply-text-input').value.trim();
+
+            if (!author || !text) {
+                showToast('Заполните поля ответа!');
+                return;
+            }
+
+            const thread = threads.find(t => t.id === currentThreadId);
+            if (!thread) return;
+
+            const newReply = {
+                author: author,
+                text: text,
+                date: formatDate()
+            };
+
+            if (!thread.replies) thread.replies = [];
+            thread.replies.push(newReply);
+
+            // обнов бд
+            database.ref('forum_threads/' + currentThreadId + '/replies').set(thread.replies);
+
+            document.getElementById('reply-author-input').value = '';
+            document.getElementById('reply-text-input').value = '';
+
+            showToast('Ваш ответ добавлен в тему!');
+        });
+
+
+        // скриптики
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 20) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+            const menu = document.getElementById('nav-menu');
+            menu.style.display = menu.style.display === 'flex' ? 'none' : 'flex';
+            if (menu.style.display === 'flex') {
+                menu.style.flexDirection = 'column';
+                menu.style.position = 'absolute';
+                menu.style.top = '80px';
+                menu.style.left = '0';
+                menu.style.width = '100%';
+                menu.style.backgroundColor = 'var(--secondary-bg)';
+                menu.style.padding = '20px';
+                menu.style.borderBottom = '1px solid var(--border-color)';
+            }
+        });
+
+        document.querySelectorAll('.faq-question').forEach(item => {
+            item.addEventListener('click', () => {
+                const parent = item.parentElement;
+                parent.classList.toggle('active');
+            });
+        });
+
+        function showToast(text) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `<i class="fas fa-info-circle"></i><span class="toast-text">${text}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.classList.add('show'), 50);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('IP-адрес скопирован в буфер обмена!');
+            }).catch(() => {
+                showToast('Не удалось скопировать.');
+            });
+        }
+
+        function simulateOnline() {
+            const playerCountEl = document.querySelector('.player-count');
+            const serverPlayerCount = document.getElementById('serverPlayerCount');
+            setInterval(() => {
+                const base = Math.floor(Math.sin(Date.now() / 60000) * 4) + 42;
+                const formatted = `${base}/64`;
+                if(playerCountEl) playerCountEl.textContent = formatted;
+                if(serverPlayerCount) serverPlayerCount.textContent = `${base} / 64`;
+            }, 5000);
+        }
+        document.addEventListener('DOMContentLoaded', simulateOnline);
+
+        document.getElementById('login-btn').addEventListener('click', () => {
+            const pass = prompt('Введите защитный пароль администратора:');
+            if (pass) {
+                const hash = CryptoJS.SHA256(pass).toString();
+                if (hash === adminHash) {
+                    showToast('Доступ разрешен. Добро пожаловать, администратор!');
+                } else {
+                    showToast('Ошибка доступа. Неверный пароль.');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
