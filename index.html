@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     
-    <!-- ПОДКЛЮЧЕНИЕ БИБЛИОТЕК FIREBASE -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
@@ -31,25 +30,18 @@
             --accent-glow: rgba(255, 51, 102, 0.25);
             --accent-glow-strong: rgba(255, 51, 102, 0.45);
             --success: #00e676;
-            --success-glow: rgba(0, 230, 118, 0.4);
             --warning: #ffb300;
-            --warning-glow: rgba(255, 179, 0, 0.4);
             --danger: #ff1744;
-            --danger-glow: rgba(255, 23, 68, 0.4);
-            --info: #00b0ff;
-            --info-glow: rgba(0, 176, 255, 0.4);
             --border-color: rgba(255, 51, 102, 0.08);
             --border-color-light: rgba(255, 51, 102, 0.18);
             --border-radius: 12px;
             --border-radius-sm: 6px;
             --border-radius-lg: 20px;
             --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-slow: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.6);
             --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.7);
             --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.9);
             --shadow-glow: 0 0 25px var(--accent-glow);
-            --shadow-glow-strong: 0 0 45px var(--accent-glow-strong);
         }
         * {
             margin: 0;
@@ -204,40 +196,6 @@
             display: flex;
             align-items: center;
             gap: 16px;
-        }
-        .server-status {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background-color: var(--secondary-bg);
-            padding: 8px 14px;
-            border-radius: 30px;
-            border: 1px solid var(--border-color);
-        }
-        .status-indicator {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: var(--text-muted);
-            transition: var(--transition);
-        }
-        .status-indicator.online {
-            background-color: var(--success);
-            box-shadow: 0 0 10px var(--success);
-        }
-        .status-indicator.offline {
-            background-color: var(--danger);
-            box-shadow: 0 0 10px var(--danger);
-        }
-        .status-text {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-muted);
-        }
-        .player-count {
-            font-size: 13px;
-            font-weight: 700;
-            color: var(--text-primary);
         }
         .mobile-menu-btn {
             display: none;
@@ -794,11 +752,6 @@
             border-bottom: 1px solid var(--border-color);
             margin-bottom: 60px;
         }
-        .servers-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-        }
         .server-card {
             background-color: var(--tertiary-bg);
             border: 1px solid var(--border-color);
@@ -829,20 +782,7 @@
         .server-name {
             font-size: 16px;
             font-weight: 700;
-            margin-bottom: 4px;
         }
-        .server-status-badge {
-            font-size: 11px;
-            font-weight: 700;
-            padding: 2px 8px;
-            border-radius: 4px;
-            text-transform: uppercase;
-            background-color: var(--text-muted);
-            color: var(--primary-bg);
-            transition: var(--transition);
-        }
-        .server-status-badge.online { background-color: rgba(0, 230, 118, 0.15); color: #34d399; }
-        .server-status-badge.offline { background-color: rgba(255, 23, 68, 0.15); color: #ff1744; }
         .server-info {
             flex-grow: 1;
             max-width: 400px;
@@ -850,34 +790,9 @@
         .server-map {
             font-size: 13px;
             color: var(--text-muted);
-            margin-bottom: 8px;
             display: inline-flex;
             align-items: center;
             gap: 6px;
-        }
-        .server-players {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .player-bar {
-            flex-grow: 1;
-            height: 6px;
-            background-color: var(--card-bg);
-            border-radius: 3px;
-            overflow: hidden;
-        }
-        .player-bar-fill {
-            height: 100%;
-            border-radius: 3px;
-            width: 0%;
-            background: linear-gradient(to right, var(--accent-bg), var(--accent-bg-light));
-            transition: width 0.5s ease-in-out;
-        }
-        .player-count-text {
-            font-size: 12px;
-            font-weight: 700;
-            white-space: nowrap;
         }
         .server-connect {
             display: flex;
@@ -1036,8 +951,6 @@
         }
         .animate-delay-1 { animation-delay: 0.05s; }
         .animate-delay-2 { animation-delay: 0.1s; }
-        .animate-delay-3 { animation-delay: 0.15s; }
-        .animate-delay-4 { animation-delay: 0.2s; }
         @keyframes fadeIn {
             to {
                 opacity: 1;
@@ -1069,7 +982,7 @@
     <nav class="navbar" id="navbar">
         <div class="container nav-container">
             <a href="#" class="logo">
-                <img src="path/to/logo.png" alt="Logo" class="logo-img" onerror="this.style.display='none'">
+                <img src="logo.png" alt="Logo" class="logo-img" onerror="this.style.display='none'">
                 <div class="logo-text">
                     <span class="logo-main">SAINT ROSE</span>
                     <span class="logo-sub">PROJECT</span>
@@ -1085,11 +998,6 @@
             </ul>
             
             <div class="nav-actions">
-                <div class="server-status" id="server-status">
-                    <span class="status-indicator"></span>
-                    <span class="status-text">Загрузка...</span>
-                    <span class="player-count">--/--</span>
-                </div>
                 <button class="btn btn-primary" id="login-btn">
                     <i class="fas fa-sign-in-alt"></i>
                     <span>Войти</span>
@@ -1153,7 +1061,7 @@
                     </div>
                 </div>
 
-                <div class="announcement-card animate-in animate-delay-1">
+                <div class="announcement-card animate-in align-delay-1">
                     <div class="announcement-meta">
                         <span class="announcement-date"><i class="far fa-calendar"></i> Вчера</span>
                         <span class="announcement-tag tag-news">Новость</span>
@@ -1303,7 +1211,7 @@
 
             <aside class="sidebar">
                 <div class="sidebar-widget animate-in">
-                    <h3><i class="fas fa-chart-bar"></i> Статистика сервера</h3>
+                    <h3><i class="fas fa-chart-bar"></i> Статистика форума</h3>
                     <div class="stat-grid">
                         <div class="stat-box">
                             <div class="stat-box-icon"><i class="fas fa-users"></i></div>
@@ -1319,7 +1227,7 @@
                 </div>
 
                 <div class="sidebar-widget discord-widget animate-in animate-delay-1">
-                    <h3><i class="fas fa-share-nodes"></i> Наши social сети</h3>
+                    <h3><i class="fas fa-share-nodes"></i> Наши сети</h3>
                     <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">Присоединяйтесь к нам на внешних площадках, чтобы следить за новостями проекта:</p>
                     <div class="social-buttons-grid">
                         <a href="https://t.me/saintroseproject" target="_blank" class="social-btn btn-tg">
@@ -1340,7 +1248,7 @@
     <section class="servers-section" id="servers">
         <div class="container">
             <div class="section-header">
-                <h2><i class="fas fa-server"></i> Статус подключения</h2>
+                <h2><i class="fas fa-server"></i> Информация о подключении</h2>
             </div>
             <div class="servers-grid">
                 <div class="server-card animate-in" id="main-server-card">
@@ -1348,15 +1256,10 @@
                         <div class="server-icon"><i class="fas fa-gamepad"></i></div>
                         <div>
                             <div class="server-name">Saint Rose RP | Garry's Mod</div>
-                            <span class="server-status-badge" id="server-status-badge">Загрузка...</span>
                         </div>
                     </div>
                     <div class="server-info">
-                        <div class="server-map"><i class="fas fa-globe"></i> Mode: Serious RolePlay</div>
-                        <div class="server-players">
-                            <div class="player-bar"><div class="player-bar-fill" id="player-bar-fill"></div></div>
-                            <span class="player-count-text" id="serverPlayerCount">-- / --</span>
-                        </div>
+                        <div class="server-map"><i class="fas fa-globe"></i> Режим: Serious RolePlay</div>
                     </div>
                     <div class="server-connect">
                         <button class="btn btn-secondary" onclick="copyToClipboard('46.174.49.224:27015')">
@@ -1399,13 +1302,13 @@
             <div class="faq-grid">
                 <div class="faq-item animate-in">
                     <div class="faq-question">
-                        <h4>Как зайти на ваш server?</h4>
+                        <h4>Как зайти на ваш сервер?</h4>
                         <div class="faq-icon"><i class="fas fa-plus"></i></div>
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
                             Запустите Garry's Mod, откройте консоль разработчика (клавиша ~) и введите команду: 
-                            <code>connect 46.174.49.224:27015</code> или просто нажмите кнопку «Начать игру» или «Подключиться к серверу» на нашем сайте.
+                            <code>connect 46.174.49.224:27015</code> или просто нажмите кнопку «Начать игру» на нашем сайте.
                         </div>
                     </div>
                 </div>
@@ -1416,7 +1319,7 @@
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            Весь необходимый контент, аддоны, моды и превью находятся в нашей официальной коллекции Steam Workshop. Вы можете перейти по кнопке «Коллекция модов» вверху страницы или воспользоваться ссылкой: <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=3742811263" target="_blank" style="color: var(--accent-bg-light);">наша коллекция</a>. Нажмите кнопку «Подписаться на все».
+                            Весь необходимый контент находится в нашей официальной коллекции Steam Workshop. Вы можете перейти по кнопке «Коллекция модов» вверху страницы или воспользоваться ссылкой: <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=3742811263" target="_blank" style="color: var(--accent-bg-light);">наша коллекция</a>. Нажмите кнопку «Подписаться на все».
                         </div>
                     </div>
                 </div>
@@ -1448,7 +1351,7 @@
     <script>
         const adminHash = "ba797c231016839fae6bf26a798548a3bf6ee2c85e33d06191f630ff04bc99cb";
 
-        // КОНФИГУРАЦИЯ И НАСТРОЙКА FIREBASE[cite: 9]
+        // КОНФИГУРАЦИЯ И НАСТРОЙКА FIREBASE (ВСТАВЬ СЮДА СВОИ КЛЮЧИ)
         const firebaseConfig = {
             apiKey: "ВАШ_API_KEY",
             authDomain: "ВАШ_PROJECT_ID.firebaseapp.com",
@@ -1485,7 +1388,7 @@
             return `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()} в ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
         }
 
-        // РЕАЛТАЙМ ПОДКЛЮЧЕНИЕ К БАЗЕ ДАННЫХ FIREBASE
+        // ПОДКЛЮЧЕНИЕ К FIREBASE В РЕАЛЬНОМ ВРЕМЕНИ
         database.ref('forum_threads').on('value', (snapshot) => {
             const data = snapshot.val();
             threads = [];
@@ -1681,70 +1584,6 @@
             showToast('Ваш ответ добавлен в тему!');
         });
 
-
-        // СКРИПТ РЕАЛЬНОГО ОБНОВЛЕНИЯ ОНЛАЙНА С ИГРОВОГО СЕРВЕРА (ВАРИАНТ 1)
-        function updateRealOnline() {
-            const serverIP = "46.174.49.224:27015";
-            
-            // Элементы в шапке (Navbar)
-            const navbarCount = document.querySelector('.player-count');
-            const navbarIndicator = document.querySelector('.status-indicator');
-            const navbarText = document.querySelector('.status-text');
-            
-            // Элементы в карточке мониторинга (Раздел "Серверы")
-            const cardCount = document.getElementById('serverPlayerCount');
-            const cardBadge = document.getElementById('server-status-badge');
-            const cardBarFill = document.getElementById('player-bar-fill');
-
-            const ipParts = serverIP.split(':');
-
-            // Отправляем безопасный запрос к независимому API Source Query
-            fetch(`https://api.gamedig.app/v1/query?type=garrysmod&host=${ipParts[0]}&port=${ipParts[1]}`)
-                .then(response => {
-                    if (!response.ok) throw new Error('Сеть недоступна');
-                    return response.json();
-                })
-                .then(data => {
-                    if (data && data.players) {
-                        const currentPlayers = data.players.length;
-                        const maxPlayers = data.maxplayers || 64;
-                        const formatted = `${currentPlayers}/${maxPlayers}`;
-                        
-                        // Считаем процент заполненности для полоски
-                        const percent = Math.min(Math.max((currentPlayers / maxPlayers) * 100, 0), 100);
-
-                        // Обновляем данные в шапке
-                        if (navbarCount) navbarCount.textContent = formatted;
-                        if (navbarIndicator) navbarIndicator.className = "status-indicator online";
-                        if (navbarText) navbarText.textContent = "Онлайн";
-                        
-                        // Обновляем данные в карточке
-                        if (cardCount) cardCount.textContent = `${currentPlayers} / ${maxPlayers}`;
-                        if (cardBarFill) cardBarFill.style.width = `${percent}%`;
-                        if (cardBadge) {
-                            cardBadge.className = "server-status-badge online";
-                            cardBadge.textContent = "Работает";
-                        }
-                    }
-                })
-                .catch(err => {
-                    console.error("Ошибка при получении Source-онлайна:", err);
-                    
-                    // Переключаем интерфейс в режим Оффлайн
-                    if (navbarCount) navbarCount.textContent = "--/--";
-                    if (navbarIndicator) navbarIndicator.className = "status-indicator offline";
-                    if (navbarText) navbarText.textContent = "Оффлайн";
-                    
-                    if (cardCount) cardCount.textContent = "0 / 0";
-                    if (cardBarFill) cardBarFill.style.width = "0%";
-                    if (cardBadge) {
-                        cardBadge.className = "server-status-badge offline";
-                        cardBadge.textContent = "Недоступен";
-                    }
-                });
-        }
-
-
         window.addEventListener('scroll', () => {
             const navbar = document.getElementById('navbar');
             if (window.scrollY > 20) {
@@ -1807,12 +1646,6 @@
                     showToast('Ошибка доступа. Неверный пароль.');
                 }
             }
-        });
-
-        // Запуск мониторинга при старте страницы и обновление каждые 30 секунд
-        document.addEventListener('DOMContentLoaded', () => {
-            updateRealOnline();
-            setInterval(updateRealOnline, 30000);
         });
     </script>
 </body>
