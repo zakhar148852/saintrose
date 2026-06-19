@@ -1708,50 +1708,47 @@
             });
         });
 
-        function showToast(text) {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.innerHTML = `<i class="fas fa-info-circle"></i><span class="toast-text">${text}</span>`;
-            container.appendChild(toast);
-            setTimeout(() => toast.classList.add('show'), 50);
-            setTimeout(() => {
-                toast.classList.remove('show');
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
-        }
+        function updateRealOnline() {
+    const serverIP = "46.174.49.224:27015";
+    const playerCountEl = document.querySelector('.player-count');
+    const serverPlayerCount = document.getElementById('serverPlayerCount');
+    const statusIndicator = document.querySelector('.status-indicator');
+    const statusText = document.querySelector('.status-text');
 
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                showToast('IP-адрес скопирован в буфер обмена!');
-            }).catch(() => {
-                showToast('Не удалось скопировать.');
-            });
-        }
-
-        function simulateOnline() {
-            const playerCountEl = document.querySelector('.player-count');
-            const serverPlayerCount = document.getElementById('serverPlayerCount');
-            setInterval(() => {
-                const base = Math.floor(Math.sin(Date.now() / 60000) * 4) + 42;
-                const formatted = `${base}/64`;
+    // Используем бесплатный API мониторинга (например, gamedig или общедоступные аналоги)
+    fetch(`https://api.gamedig.app/v1/query?type=garrysmod&host=${serverIP.split(':')[0]}&port=${serverIP.split(':')[1]}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data && data.players) {
+                const currentPlayers = data.players.length;
+                const maxPlayers = data.maxplayers || 64;
+                const formatted = `${currentPlayers}/${maxPlayers}`;
+                
                 if(playerCountEl) playerCountEl.textContent = formatted;
-                if(serverPlayerCount) serverPlayerCount.textContent = `${base} / 64`;
-            }, 5000);
-        }
-        document.addEventListener('DOMContentLoaded', simulateOnline);
-
-        document.getElementById('login-btn').addEventListener('click', () => {
-            const pass = prompt('Введите защитный пароль администратора:');
-            if (pass) {
-                const hash = CryptoJS.SHA256(pass).toString();
-                if (hash === adminHash) {
-                    showToast('Доступ разрешен. Добро пожаловать, администратор!');
-                } else {
-                    showToast('Ошибка доступа. Неверный пароль.');
-                }
+                if(serverPlayerCount) serverPlayerCount.textContent = `${currentPlayers} / ${maxPlayers}`;
+                
+                // Устанавливаем статус "Онлайн"
+                statusIndicator.className = "status-indicator online";
+                statusText.textContent = "Онлайн";
             }
+        })
+        .catch(err => {
+            console.error("Ошибка обновления онлайна:", err);
+            // Если сервер недоступен
+            statusIndicator.className = "status-indicator";
+            statusIndicator.style.backgroundColor = "var(--danger)";
+            statusText.textContent = "Оффлайн";
         });
+}
+
+// Запускаем при загрузке и обновляем каждые 30 секунд
+document.addEventListener('DOMContentLoaded', () => {
+    updateRealOnline();
+    setInterval(updateRealOnline, 30000); 
+});
+        }
+
+        simulateOnline()
     </script>
 </body>
 </html>
