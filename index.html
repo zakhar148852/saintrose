@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     
+    <!-- ПОДКЛЮЧЕНИЕ БИБЛИОТЕК FIREBASE -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
@@ -30,18 +31,25 @@
             --accent-glow: rgba(255, 51, 102, 0.25);
             --accent-glow-strong: rgba(255, 51, 102, 0.45);
             --success: #00e676;
+            --success-glow: rgba(0, 230, 118, 0.4);
             --warning: #ffb300;
+            --warning-glow: rgba(255, 179, 0, 0.4);
             --danger: #ff1744;
+            --danger-glow: rgba(255, 23, 68, 0.4);
+            --info: #00b0ff;
+            --info-glow: rgba(0, 176, 255, 0.4);
             --border-color: rgba(255, 51, 102, 0.08);
             --border-color-light: rgba(255, 51, 102, 0.18);
             --border-radius: 12px;
             --border-radius-sm: 6px;
             --border-radius-lg: 20px;
             --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.6);
             --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.7);
             --shadow-lg: 0 10px 40px rgba(0, 0, 0, 0.9);
             --shadow-glow: 0 0 25px var(--accent-glow);
+            --shadow-glow-strong: 0 0 45px var(--accent-glow-strong);
         }
         * {
             margin: 0;
@@ -196,6 +204,34 @@
             display: flex;
             align-items: center;
             gap: 16px;
+        }
+        .server-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background-color: var(--secondary-bg);
+            padding: 8px 14px;
+            border-radius: 30px;
+            border: 1px solid var(--border-color);
+        }
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        .status-indicator.online {
+            background-color: var(--success);
+            box-shadow: 0 0 10px var(--success);
+        }
+        .status-text {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+        .player-count {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-primary);
         }
         .mobile-menu-btn {
             display: none;
@@ -752,6 +788,11 @@
             border-bottom: 1px solid var(--border-color);
             margin-bottom: 60px;
         }
+        .servers-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
         .server-card {
             background-color: var(--tertiary-bg);
             border: 1px solid var(--border-color);
@@ -782,7 +823,16 @@
         .server-name {
             font-size: 16px;
             font-weight: 700;
+            margin-bottom: 4px;
         }
+        .server-status-badge {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+        .server-status-badge.online { background-color: rgba(0, 230, 118, 0.15); color: #34d399; }
         .server-info {
             flex-grow: 1;
             max-width: 400px;
@@ -790,9 +840,32 @@
         .server-map {
             font-size: 13px;
             color: var(--text-muted);
+            margin-bottom: 8px;
             display: inline-flex;
             align-items: center;
             gap: 6px;
+        }
+        .server-players {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .player-bar {
+            flex-grow: 1;
+            height: 6px;
+            background-color: var(--card-bg);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        .player-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+        }
+        .player-bar-fill.high { background: linear-gradient(to right, var(--accent-bg), var(--accent-bg-light)); }
+        .player-count-text {
+            font-size: 12px;
+            font-weight: 700;
+            white-space: nowrap;
         }
         .server-connect {
             display: flex;
@@ -951,6 +1024,8 @@
         }
         .animate-delay-1 { animation-delay: 0.05s; }
         .animate-delay-2 { animation-delay: 0.1s; }
+        .animate-delay-3 { animation-delay: 0.15s; }
+        .animate-delay-4 { animation-delay: 0.2s; }
         @keyframes fadeIn {
             to {
                 opacity: 1;
@@ -982,7 +1057,7 @@
     <nav class="navbar" id="navbar">
         <div class="container nav-container">
             <a href="#" class="logo">
-                <img src="logo.png" alt="Logo" class="logo-img" onerror="this.style.display='none'">
+                <img src="path/to/logo.png" alt="Logo" class="logo-img" onerror="this.style.display='none'">
                 <div class="logo-text">
                     <span class="logo-main">SAINT ROSE</span>
                     <span class="logo-sub">PROJECT</span>
@@ -998,14 +1073,7 @@
             </ul>
             
             <div class="nav-actions">
-                <button class="btn btn-primary" id="login-btn">
-                    <i class="fas fa-sign-in-alt"></i>
-                    <span>Войти</span>
-                </button>
-                <button class="btn btn-icon mobile-menu-btn" id="mobile-menu-btn">
-                    <i class="fas fa-bars"></i>
-                </button>
-            </div>
+                </div>
         </div>
     </nav>
 
@@ -1061,7 +1129,7 @@
                     </div>
                 </div>
 
-                <div class="announcement-card animate-in align-delay-1">
+                <div class="announcement-card animate-in animate-delay-1">
                     <div class="announcement-meta">
                         <span class="announcement-date"><i class="far fa-calendar"></i> Вчера</span>
                         <span class="announcement-tag tag-news">Новость</span>
@@ -1211,7 +1279,7 @@
 
             <aside class="sidebar">
                 <div class="sidebar-widget animate-in">
-                    <h3><i class="fas fa-chart-bar"></i> Статистика форума</h3>
+                    <h3><i class="fas fa-chart-bar"></i> Статистика сервера</h3>
                     <div class="stat-grid">
                         <div class="stat-box">
                             <div class="stat-box-icon"><i class="fas fa-users"></i></div>
@@ -1227,7 +1295,7 @@
                 </div>
 
                 <div class="sidebar-widget discord-widget animate-in animate-delay-1">
-                    <h3><i class="fas fa-share-nodes"></i> Наши сети</h3>
+                    <h3><i class="fas fa-share-nodes"></i> Наши social сети</h3>
                     <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;">Присоединяйтесь к нам на внешних площадках, чтобы следить за новостями проекта:</p>
                     <div class="social-buttons-grid">
                         <a href="https://t.me/saintroseproject" target="_blank" class="social-btn btn-tg">
@@ -1248,18 +1316,23 @@
     <section class="servers-section" id="servers">
         <div class="container">
             <div class="section-header">
-                <h2><i class="fas fa-server"></i> Информация о подключении</h2>
+                <h2><i class="fas fa-server"></i> Статус подключения</h2>
             </div>
             <div class="servers-grid">
-                <div class="server-card animate-in" id="main-server-card">
+                <div class="server-card online animate-in">
                     <div class="server-header">
                         <div class="server-icon"><i class="fas fa-gamepad"></i></div>
                         <div>
                             <div class="server-name">Saint Rose RP | Garry's Mod</div>
+                            <span class="server-status-badge online">Работает</span>
                         </div>
                     </div>
                     <div class="server-info">
-                        <div class="server-map"><i class="fas fa-globe"></i> Режим: Serious RolePlay</div>
+                        <div class="server-map"><i class="fas fa-globe"></i> Mode: Lite RolePlay</div>
+                        <div class="server-players">
+                            <div class="player-bar"><div class="player-bar-fill high" style="width: 65%;"></div></div>
+                            <span class="player-count-text" id="serverPlayerCount">42 / 64</span>
+                        </div>
                     </div>
                     <div class="server-connect">
                         <button class="btn btn-secondary" onclick="copyToClipboard('46.174.49.224:27015')">
@@ -1302,13 +1375,13 @@
             <div class="faq-grid">
                 <div class="faq-item animate-in">
                     <div class="faq-question">
-                        <h4>Как зайти на ваш сервер?</h4>
+                        <h4>Как зайти на ваш server?</h4>
                         <div class="faq-icon"><i class="fas fa-plus"></i></div>
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
                             Запустите Garry's Mod, откройте консоль разработчика (клавиша ~) и введите команду: 
-                            <code>connect 46.174.49.224:27015</code> или просто нажмите кнопку «Начать игру» на нашем сайте.
+                            <code>connect 46.174.49.224:27015</code> или просто нажмите кнопку «Начать игру» или «Подключиться к серверу» на нашем сайте.
                         </div>
                     </div>
                 </div>
@@ -1319,7 +1392,7 @@
                     </div>
                     <div class="faq-answer">
                         <div class="faq-answer-content">
-                            Весь необходимый контент находится в нашей официальной коллекции Steam Workshop. Вы можете перейти по кнопке «Коллекция модов» вверху страницы или воспользоваться ссылкой: <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=3742811263" target="_blank" style="color: var(--accent-bg-light);">наша коллекция</a>. Нажмите кнопку «Подписаться на все».
+                            Весь необходимый контент, аддоны, моды и превью находятся в нашей официальной коллекции Steam Workshop. Вы можете перейти по кнопке «Коллекция модов» вверху страницы или воспользоваться ссылкой: <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=3742811263" target="_blank" style="color: var(--accent-bg-light);">наша коллекция</a>. Нажмите кнопку «Подписаться на все».
                         </div>
                     </div>
                 </div>
@@ -1351,15 +1424,16 @@
     <script>
         const adminHash = "ba797c231016839fae6bf26a798548a3bf6ee2c85e33d06191f630ff04bc99cb";
 
-        // КОНФИГУРАЦИЯ И НАСТРОЙКА FIREBASE (ВСТАВЬ СЮДА СВОИ КЛЮЧИ)
+        // КОНФИГУРАЦИЯ И НАСТРОЙКА FIREBASE[cite: 9]
         const firebaseConfig = {
-            apiKey: "ВАШ_API_KEY",
-            authDomain: "ВАШ_PROJECT_ID.firebaseapp.com",
-            databaseURL: "https://ВАШ_PROJECT_ID-default-rtdb.firebaseio.com",
-            projectId: "ВАШ_PROJECT_ID",
-            storageBucket: "ВАШ_PROJECT_ID.appspot.com",
-            messagingSenderId: "ВАШ_SENDER_ID",
-            appId: "ВАШ_APP_ID"
+            apiKey: "AIzaSyBfkdAjIGP-81xlMYs8UL6G4-WWLHO9tSM",
+            authDomain: "saintrose-fcb5b.firebaseapp.com",
+            databaseURL: "https://saintrose-fcb5b-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "saintrose-fcb5b",
+            storageBucket: "saintrose-fcb5b.firebasestorage.app",
+            messagingSenderId: "935444066735",
+            appId: "1:935444066735:web:d104497e3af5c872d83f5a",
+            measurementId: "G-FQTETMP5M4"
         };
 
         firebase.initializeApp(firebaseConfig);
@@ -1388,22 +1462,25 @@
             return `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}.${d.getFullYear()} в ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
         }
 
-        // ПОДКЛЮЧЕНИЕ К FIREBASE В РЕАЛЬНОМ ВРЕМЕНИ
+        // РЕАЛТАЙМ ПОДКЛЮЧЕНИЕ К БАЗЕ ДАННЫХ FIREBASE
         database.ref('forum_threads').on('value', (snapshot) => {
             const data = snapshot.val();
             threads = [];
             if (data) {
+                // Превращаем полученный объект Firebase в массив
                 threads = Object.keys(data).map(key => {
                     const thread = data[key];
-                    thread.id = key;
+                    thread.id = key; // Используем строковый ключ Firebase в качестве id
                     if (!thread.replies) thread.replies = [];
                     return thread;
                 });
+                // Сортируем: новые темы сверху по таймстампу
                 threads.sort((a, b) => b.timestamp - a.timestamp);
             }
             updateForumStats();
             renderThreadsList();
 
+            // Если у пользователя сейчас открыта конкретная тема, обновляем её контент
             if (currentThreadId) {
                 const updatedThread = threads.find(t => t.id === currentThreadId);
                 if (updatedThread) {
@@ -1526,6 +1603,7 @@
             newThreadFormBox.style.display = 'none';
         });
 
+        // СОЗДАНИЕ ТЕМЫ В FIREBASE
         document.getElementById('btn-submit-thread').addEventListener('click', () => {
             const author = document.getElementById('thread-author-input').value.trim();
             const title = document.getElementById('thread-title-input').value.trim();
@@ -1545,6 +1623,7 @@
                 replies: []
             };
 
+            // Отправляем в Firebase Realtime Database
             database.ref('forum_threads').push(newThread);
 
             document.getElementById('thread-author-input').value = '';
@@ -1555,6 +1634,7 @@
             showToast('Тема успешно опубликована!');
         });
 
+        // ОТПРАВКА ОТВЕТА В FIREBASE
         document.getElementById('btn-submit-reply').addEventListener('click', () => {
             const author = document.getElementById('reply-author-input').value.trim();
             const text = document.getElementById('reply-text-input').value.trim();
@@ -1576,6 +1656,7 @@
             if (!thread.replies) thread.replies = [];
             thread.replies.push(newReply);
 
+            // Обновляем массив ответов в конкретной ветке темы Firebase
             database.ref('forum_threads/' + currentThreadId + '/replies').set(thread.replies);
 
             document.getElementById('reply-author-input').value = '';
@@ -1584,6 +1665,8 @@
             showToast('Ваш ответ добавлен в тему!');
         });
 
+
+        // ОСТАЛЬНЫЕ СКРИПТЫ ИНТЕРФЕЙСА
         window.addEventListener('scroll', () => {
             const navbar = document.getElementById('navbar');
             if (window.scrollY > 20) {
@@ -1635,6 +1718,18 @@
                 showToast('Не удалось скопировать.');
             });
         }
+
+        function simulateOnline() {
+            const playerCountEl = document.querySelector('.player-count');
+            const serverPlayerCount = document.getElementById('serverPlayerCount');
+            setInterval(() => {
+                const base = Math.floor(Math.sin(Date.now() / 60000) * 4) + 42;
+                const formatted = `${base}/64`;
+                if(playerCountEl) playerCountEl.textContent = formatted;
+                if(serverPlayerCount) serverPlayerCount.textContent = `${base} / 64`;
+            }, 5000);
+        }
+        document.addEventListener('DOMContentLoaded', simulateOnline);
 
         document.getElementById('login-btn').addEventListener('click', () => {
             const pass = prompt('Введите защитный пароль администратора:');
